@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<!-- Load Plotly JS CDN in head so it is loaded before inline scripts compile -->
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+{% endblock %}
+
+{% block extra_css %}
+<!-- Optional Plotly styles -->
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-12">
+        <h2 class="fw-bold text-dark"><i class="fa-solid fa-chart-line me-2"></i>Model Analytics & Benchmarks</h2>
+        <p class="text-muted">Compare algorithm candidates trained on the Pima Indians reference dataset and review validation curves.</p>
+    </div>
+</div>
+
+{% if metrics_exists %}
+<!-- Metrics cards panel -->
+<div class="row g-3 mb-5">
+    <div class="col-md-4 col-lg-2 col-6">
+        <div class="metric-card-box border-start border-primary border-4 h-100">
+            <div class="metric-card-val text-truncate fs-5">{{ best_model_name }}</div>
+            <div class="metric-card-lbl">Best Classifier</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2 col-6">
+        <div class="metric-card-box border-start border-success border-4 h-100">
+            <div class="metric-card-val">{{ accuracy_percent }}%</div>
+            <div class="metric-card-lbl">Accuracy</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2 col-6">
+        <div class="metric-card-box border-start border-info border-4 h-100">
+            <div class="metric-card-val">{{ precision_percent }}%</div>
+            <div class="metric-card-lbl">Precision</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2 col-6">
+        <div class="metric-card-box border-start border-warning border-4 h-100">
+            <div class="metric-card-val">{{ recall_percent }}%</div>
+            <div class="metric-card-lbl">Recall (Sensitivity)</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2 col-6">
+        <div class="metric-card-box border-start border-danger border-4 h-100">
+            <div class="metric-card-val">{{ f1_percent }}%</div>
+            <div class="metric-card-lbl">F1-Score</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2 col-6">
+        <div class="metric-card-box border-start border-purple border-4 h-100" style="border-left-color: #8e44ad !important;">
+            <div class="metric-card-val">{{ roc_auc_percent }}%</div>
+            <div class="metric-card-lbl">ROC-AUC Score</div>
+        </div>
+    </div>
+</div>
+
+<!-- Plotly charts rows -->
+<div class="row">
+    <!-- Chart 1: Model Comparison -->
+    <div class="col-lg-7 mb-4">
+        <div class="card border-0 shadow-sm modern-card h-100">
+            <div class="card-header-dark">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-chart-bar me-2"></i>Candidate Model Metrics Comparison</h5>
+            </div>
+            <div class="card-body p-3">
+                <div class="plotly-wrapper border-0 shadow-none">
+                    {{ chart_comp|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart 2: Feature Importance -->
+    <div class="col-lg-5 mb-4">
+        <div class="card border-0 shadow-sm modern-card h-100">
+            <div class="card-header-dark">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-list-check me-2"></i>Feature Weights ({{ best_model_name }})</h5>
+            </div>
+            <div class="card-body p-3">
+                <div class="plotly-wrapper border-0 shadow-none">
+                    {{ chart_imp|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Chart 3: Confusion Matrix -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm modern-card h-100">
+            <div class="card-header-dark">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-border-all me-2"></i>Confusion Matrix ({{ best_model_name }})</h5>
+            </div>
+            <div class="card-body p-3">
+                <div class="plotly-wrapper border-0 shadow-none">
+                    {{ chart_cm|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 4: ROC Curve -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm modern-card h-100">
+            <div class="card-header-dark">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-chart-line me-2"></i>ROC Validation Curve ({{ best_model_name }})</h5>
+            </div>
+            <div class="card-body p-3">
+                <div class="plotly-wrapper border-0 shadow-none">
+                    {{ chart_roc|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- Error/Warning state when metrics.json does not exist -->
+<div class="row my-5">
+    <div class="col-lg-8 mx-auto text-center">
+        <div class="card border-0 shadow p-5">
+            <div class="mb-4 text-warning">
+                <i class="fa-solid fa-triangle-exclamation fa-5x"></i>
+            </div>
+            <h3 class="fw-bold">Model Metrics Not Found</h3>
+            <p class="text-secondary max-width-600 mx-auto">
+                No benchmarking statistics exist on disk. Please compile the ML classifiers to build benchmarks.
+            </p>
+            <div class="alert alert-light border my-4 text-start font-monospace">
+                python ml/train_model.py
+            </div>
+            <div>
+                <a href="{% url 'diabetes_app:home' %}" class="btn btn-outline-secondary px-4"><i class="fa-solid fa-house me-1"></i>Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

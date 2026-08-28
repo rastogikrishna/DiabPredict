@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessment Report - DiabPredict{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Result Header -->
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm border-start border-4 {% if record.predicted_class == 1 %}border-danger{% else %}border-success{% endif %}">
+            <div>
+                <h4 class="mb-1 fw-bold text-dark">Patient Assessment Report</h4>
+                <p class="mb-0 text-muted">ID: #{{ record.id }} | Checked on: {{ record.timestamp|date:"Y-m-d H:i" }}</p>
+            </div>
+            <div>
+                <a href="{% url 'diabetes_app:predict' %}" class="btn btn-teal-primary text-white"><i class="fa-solid fa-plus me-1"></i>New Prediction</a>
+                <a href="{% url 'diabetes_app:history' %}" class="btn btn-outline-secondary"><i class="fa-solid fa-history me-1"></i>History</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Primary Result Banner (Large & High Contrast) -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm text-center py-4 px-3 {% if record.predicted_class == 1 %}bg-danger-subtle border-start border-danger border-4{% else %}bg-success-subtle border-start border-success border-4{% endif %}">
+            <div class="card-body">
+                <div class="mb-2">
+                    {% if record.predicted_class == 1 %}
+                        <i class="fa-solid fa-triangle-exclamation text-danger fa-4x mb-3"></i>
+                        <h1 class="display-5 fw-extrabold text-danger mb-2">DIABETES DETECTED</h1>
+                        <p class="fs-4 text-danger-emphasis mb-0">Model predicts that diabetes is <strong>likely</strong>.</p>
+                    {% else %}
+                        <i class="fa-solid fa-circle-check text-success fa-4x mb-3"></i>
+                        <h1 class="display-5 fw-extrabold text-success mb-2">DIABETES NOT DETECTED</h1>
+                        <p class="fs-4 text-success-emphasis mb-0">Model predicts that diabetes is <strong>unlikely</strong>.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Probability Metrics & Gauge Panel -->
+    <div class="col-lg-5 mb-4">
+        <div class="card border-0 shadow-sm modern-card">
+            <div class="card-header-dark">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-gauge-high me-2"></i>Probability & Confidence</h5>
+            </div>
+            <div class="card-body p-4 text-center">
+                
+                <!-- Plotly Gauge Chart -->
+                <div class="plotly-wrapper border-0 p-0 shadow-none mb-3">
+                    <h6 class="text-secondary small fw-bold mb-2">Diabetes Probability</h6>
+                    {{ gauge_chart|safe }}
+                </div>
+                
+                <!-- Stats Summary -->
+                <div class="list-group list-group-flush text-start mb-4">
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 bg-transparent">
+                        <span class="text-secondary small fw-bold">Diabetes Prediction</span>
+                        <span class="badge {% if record.predicted_class == 1 %}bg-danger{% else %}bg-success{% endif %} fs-6">{{ prediction_label }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 bg-transparent">
+                        <span class="text-secondary small fw-bold">Diabetes Probability (Class 1)</span>
+                        <span class="fw-extrabold text-dark">{{ probability_percent }}%</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 bg-transparent">
+                        <span class="text-secondary small fw-bold">Non-Diabetes Probability (Class 0)</span>
+                        <span class="fw-extrabold text-dark">{{ non_diabetes_probability_percent }}%</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 bg-transparent">
+                        <span class="text-secondary small fw-bold">Prediction Confidence</span>
+                        <span class="fw-extrabold text-dark">{{ confidence_percent }}%</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 bg-transparent">
+                        <span class="text-secondary small fw-bold">Calculated Risk Level</span>
+                        <span class="badge {% if record.risk_level == 'HIGH' %}bg-danger{% elif record.risk_level == 'MODERATE' %}bg-warning text-dark{% else %}bg-success{% endif %}">{{ record.risk_level }}</span>
+                    </div>
+                </div>
+                
+                <!-- Medical Disclaimer Callout -->
+                <div class="alert alert-warning border text-start small mb-0">
+                    <h6 class="alert-heading fw-bold mb-1"><i class="fa-solid fa-shield-halved text-warning me-2"></i>Medical Disclaimer:</h6>
+                    <p class="mb-0 text-secondary" style="font-size: 0.8rem;">
+                        This application is designed for educational and decision support purposes only. Wording such as "diabetes detected" refers strictly to the classifier model's mathematical prediction based on sample databases. It does not constitute a clinical medical diagnosis.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Inputs Summary Card -->
+    <div class="col-lg-7 mb-4">
+        <div class="card border-0 shadow-sm modern-card">
+            <div class="card-header-dark">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-table-list me-2"></i>Patient Clinical Input Summary</h5>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted small mb-4">These biometric features were evaluated by the model classifier pipeline:</p>
+                
+                <div class="row g-3">
+                    <div class="col-6 col-sm-4">
+                        <div class="p-3 border rounded text-center bg-light">
+                            <div class="text-secondary small fw-semibold">Glucose Level</div>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ record.glucose|floatformat:0 }}</h3>
+                            <span class="badge bg-secondary-subtle text-secondary small">mg/dL</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <div class="p-3 border rounded text-center bg-light">
+                            <div class="text-secondary small fw-semibold">Body Mass Index</div>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ record.bmi|floatformat:1 }}</h3>
+                            <span class="badge bg-secondary-subtle text-secondary small">BMI</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <div class="p-3 border rounded text-center bg-light">
+                            <div class="text-secondary small fw-semibold">Patient Age</div>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ record.age }}</h3>
+                            <span class="badge bg-secondary-subtle text-secondary small">years</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <div class="p-3 border rounded text-center bg-light">
+                            <div class="text-secondary small fw-semibold">Pregnancies</div>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ record.pregnancies }}</h3>
+                            <span class="badge bg-secondary-subtle text-secondary small">count</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <div class="p-3 border rounded text-center bg-light">
+                            <div class="text-secondary small fw-semibold">Blood Pressure</div>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ record.blood_pressure|floatformat:0 }}</h3>
+                            <span class="badge bg-secondary-subtle text-secondary small">mmHg</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <div class="p-3 border rounded text-center bg-light">
+                            <div class="text-secondary small fw-semibold">Pedigree Score</div>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ record.diabetes_pedigree_function|floatformat:3 }}</h3>
+                            <span class="badge bg-secondary-subtle text-secondary small">score</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-3 mt-1">
+                    <div class="col-6 col-sm-6">
+                        <div class="p-3 border rounded text-center bg-light">
+                            <div class="text-secondary small fw-semibold">Skin Thickness</div>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ record.skin_thickness|floatformat:0 }}</h3>
+                            <span class="badge bg-secondary-subtle text-secondary small">mm</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-6">
+                        <div class="p-3 border rounded text-center bg-light">
+                            <div class="text-secondary small fw-semibold">Serum Insulin</div>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ record.insulin|floatformat:0 }}</h3>
+                            <span class="badge bg-secondary-subtle text-secondary small">µU/mL</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-light border small text-muted py-2 mt-4 mb-0">
+                    <i class="fa-solid fa-circle-question text-info me-1"></i> Values of <strong>0</strong> in Glucose, BP, Skin Thickness, Insulin, or BMI represent missing variables that the imputer preprocessed automatically.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SHAP Explanation Section (Prominent) -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card border-0 shadow-sm modern-card">
+            <div class="card-header-dark">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-shapes me-2"></i>Why did the model make this prediction?</h5>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <p class="text-secondary mb-4">
+                    The chart below highlights the <strong>top 5 biometric features</strong> that influenced this prediction outcome. 
+                    Factors shifting the prediction towards diabetes are highlighted in <span class="text-danger fw-bold">Red (positive values)</span>, 
+                    while protective/mitigating factors that reduced diabetes likelihood are shown in <span class="text-success fw-bold">Green (negative values)</span>.
+                </p>
+
+                <!-- Top 5 SHAP bars list -->
+                <div class="shap-list my-4">
+                    {% for item in explanations %}
+                        <div class="row align-items-center mb-3 shap-bar-container">
+                            <div class="col-md-3 col-sm-4 text-md-end mb-1 mb-md-0">
+                                <span class="shap-label">{{ item.feature }}</span>
+                                <span class="text-muted small">({{ item.value }})</span>
+                            </div>
+                            <div class="col-md-7 col-sm-6">
+                                <div class="shap-bar-wrapper">
+                                    <div class="shap-bar {% if item.effect == 'positive' %}positive{% else %}negative{% endif %}" 
+                                         data-width="{{ item.width_percent }}" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 text-start">
+                                <span class="shap-value-badge {% if item.effect == 'positive' %}positive{% else %}negative{% endif %}">
+                                    {% if item.effect == 'positive' %}+{% endif %}{{ item.display_shap }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if not shap_success %}
+                    <div class="alert alert-light border py-2 small text-muted mb-0 mt-3">
+                        <i class="fa-solid fa-info-circle me-1 text-info"></i>
+                        Note: Local explainer diagnostics are initializing. Presenting standard reference cohort attribution weights.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

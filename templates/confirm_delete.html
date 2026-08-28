@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Deletion - DiabPredict{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow border-0">
+            <div class="card-header bg-danger text-white py-3">
+                <h5 class="card-title mb-0"><i class="fa-solid fa-triangle-exclamation me-2"></i>Irreversible Action</h5>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-secondary">Are you sure you want to permanently delete the diabetes risk prediction record for:</p>
+                
+                <div class="alert alert-light border mb-4">
+                    <h5 class="alert-heading text-dark mb-1"><strong>{{ patient_name }}</strong></h5>
+                    <p class="mb-0 text-muted small">
+                        Assessment Date: {{ record.created_at|date:"Y-m-d H:i" }} <br>
+                        Calculated Risk: {% widthratio record.prediction_probability 1 100 %}% 
+                        ({% if record.prediction_class %}High Risk{% else %}Low Risk{% endif %})
+                    </p>
+                </div>
+                
+                <div class="text-muted small mb-4">
+                    <i class="fa-solid fa-circle-info text-info me-1"></i> Deleting this record will remove it from all cohort statistics, history grids, and population analytics. This cannot be undone.
+                </div>
+                
+                <form method="post" action="{% url 'diabetes_app:delete_record' record.pk %}">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'diabetes_app:history' %}" class="btn btn-outline-secondary px-4"><i class="fa-solid fa-xmark me-1"></i>Cancel</a>
+                        <button type="submit" class="btn btn-danger px-4"><i class="fa-solid fa-trash me-1"></i>Permanently Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

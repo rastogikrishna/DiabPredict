@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Assessment - DiabPredict{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card modern-card border-0">
+            <div class="card-header-dark py-3">
+                <h3 class="mb-0"><i class="fa-solid fa-file-medical me-2"></i>Patient Biometric Assessment</h3>
+                <p class="text-white-50 small mb-0 mt-1">Please enter the clinical variables. Model training utilizes the Pima Indians female cohort (age 21+).</p>
+            </div>
+            
+            <div class="card-body p-4 p-md-5">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <!-- Left Column: History & Demographics -->
+                        <div class="col-md-6 pe-md-4 border-end">
+                            <h5 class="mb-4 text-info fw-bold"><i class="fa-solid fa-id-card me-2"></i>History & Demographics</h5>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.age.id_for_label }}" class="form-label">Age (Years) <span class="text-danger">*</span></label>
+                                {{ form.age }}
+                                <div class="form-text">Patient age in years (min: 21).</div>
+                                {% if form.age.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.age.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.pregnancies.id_for_label }}" class="form-label">Pregnancies <span class="text-danger">*</span></label>
+                                {{ form.pregnancies }}
+                                <div class="form-text">Number of times pregnant. Enter 0 if none.</div>
+                                {% if form.pregnancies.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.pregnancies.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.diabetes_pedigree_function.id_for_label }}" class="form-label">Diabetes Pedigree Function <span class="text-danger">*</span></label>
+                                {{ form.diabetes_pedigree_function }}
+                                <div class="form-text">Family history score. Typically ranges between 0.08 and 2.42.</div>
+                                {% if form.diabetes_pedigree_function.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.diabetes_pedigree_function.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column: Clinical Measurements -->
+                        <div class="col-md-6 ps-md-4">
+                            <h5 class="mb-4 text-success fw-bold"><i class="fa-solid fa-heart-pulse me-2"></i>Biometric & Clinical Data</h5>
+                            
+                            <div class="row">
+                                <div class="col-sm-6 mb-3">
+                                    <label for="{{ form.glucose.id_for_label }}" class="form-label">Glucose (mg/dL) <span class="text-danger">*</span></label>
+                                    {{ form.glucose }}
+                                    <div class="form-text">2-hour oral glucose tolerance test.</div>
+                                    {% if form.glucose.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.glucose.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label for="{{ form.blood_pressure.id_for_label }}" class="form-label">Blood Pressure (mmHg) <span class="text-danger">*</span></label>
+                                    {{ form.blood_pressure }}
+                                    <div class="form-text">Diastolic pressure value.</div>
+                                    {% if form.blood_pressure.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.blood_pressure.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-sm-6 mb-3">
+                                    <label for="{{ form.skin_thickness.id_for_label }}" class="form-label">Skin Thickness (mm) <span class="text-danger">*</span></label>
+                                    {{ form.skin_thickness }}
+                                    <div class="form-text">Triceps skin fold thickness.</div>
+                                    {% if form.skin_thickness.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.skin_thickness.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label for="{{ form.insulin.id_for_label }}" class="form-label">Insulin (µU/mL) <span class="text-danger">*</span></label>
+                                    {{ form.insulin }}
+                                    <div class="form-text">2-hour serum insulin.</div>
+                                    {% if form.insulin.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.insulin.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.bmi.id_for_label }}" class="form-label">BMI (kg/m²) <span class="text-danger">*</span></label>
+                                {{ form.bmi }}
+                                <div class="form-text">Weight in kg / (Height in m)².</div>
+                                {% if form.bmi.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.bmi.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="alert alert-light border small text-muted py-2 mt-3 mb-0">
+                                <i class="fa-solid fa-circle-question text-info me-1"></i> If values for <strong>Glucose, BP, Skin Thickness, Insulin, or BMI</strong> are unknown, enter <strong>0</strong>. Imputer uses the dataset median baseline automatically.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'diabetes_app:home' %}" class="btn btn-outline-secondary btn-lg"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+                        <button type="submit" class="btn btn-teal-primary btn-lg px-5" style="background-color: var(--teal-primary); border: none; font-weight: 600; color: white;">
+                            Predict Diabetes Risk
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

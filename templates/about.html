@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}About - DiabPredict{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold text-dark"><i class="fa-solid fa-info-circle me-2"></i>About DiabPredict</h2>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Description & How It Works -->
+    <div class="col-lg-7 mb-4">
+        <div class="card border-0 shadow-sm modern-card p-4 p-md-5 mb-4">
+            <h4 class="fw-bold text-dark mb-3">About DiabPredict</h4>
+            <p class="text-secondary mb-4">
+                DiabPredict is an explainable machine learning web application that estimates diabetes risk from eight patient health features using a trained classification model.
+            </p>
+            
+            <h4 class="fw-bold text-dark mb-3">How DiabPredict Works</h4>
+            <ol class="text-secondary ps-3 mb-0" style="line-height: 1.8;">
+                <li>User enters patient information</li>
+                <li>Input validation and preprocessing</li>
+                <li>Machine learning prediction</li>
+                <li>Diabetes probability calculation</li>
+                <li>Risk classification</li>
+                <li>SHAP-based explanation</li>
+                <li>Result and model interpretation</li>
+            </ol>
+        </div>
+
+        <div class="card border-0 shadow-sm modern-card p-4 p-md-5 mb-4">
+            <h4 class="fw-bold text-dark mb-3">Model</h4>
+            <p class="text-secondary mb-3">
+                DiabPredict trains and compares the following classifier models on database records to find the highest-performing pipeline:
+            </p>
+            <ul class="text-secondary mb-3" style="line-height: 1.8;">
+                <li>Logistic Regression</li>
+                <li>Decision Tree</li>
+                <li>Random Forest</li>
+            </ul>
+            <p class="text-secondary mb-0">
+                The models are evaluated using stratified cross-validation metrics. Currently, the selected best-performing model integrated into the pipeline is <strong>Logistic Regression</strong>.
+            </p>
+        </div>
+
+        <div class="card border-0 shadow-sm modern-card p-4 p-md-5 mb-4">
+            <h4 class="fw-bold text-dark mb-3">Explainability</h4>
+            <p class="text-secondary mb-0">
+                DiabPredict uses SHAP (SHapley Additive exPlanations) values to calculate and display the game-theoretic contributions of each metric. This shows exactly which patient features contributed most strongly toward or away from the model's diabetes prediction.
+            </p>
+        </div>
+    </div>
+
+    <!-- Features & Technology -->
+    <div class="col-lg-5 mb-4">
+        <div class="card border-0 shadow-sm modern-card p-4 mb-4">
+            <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-list text-primary me-2"></i>Features Used</h5>
+            <ul class="list-group list-group-flush text-secondary">
+                <li class="list-group-item bg-transparent px-0 py-2 border-0"><i class="fa-solid fa-circle text-teal-primary me-2" style="font-size: 0.5rem; vertical-align: middle;"></i>Pregnancies</li>
+                <li class="list-group-item bg-transparent px-0 py-2 border-0"><i class="fa-solid fa-circle text-teal-primary me-2" style="font-size: 0.5rem; vertical-align: middle;"></i>Glucose</li>
+                <li class="list-group-item bg-transparent px-0 py-2 border-0"><i class="fa-solid fa-circle text-teal-primary me-2" style="font-size: 0.5rem; vertical-align: middle;"></i>Blood Pressure</li>
+                <li class="list-group-item bg-transparent px-0 py-2 border-0"><i class="fa-solid fa-circle text-teal-primary me-2" style="font-size: 0.5rem; vertical-align: middle;"></i>Skin Thickness</li>
+                <li class="list-group-item bg-transparent px-0 py-2 border-0"><i class="fa-solid fa-circle text-teal-primary me-2" style="font-size: 0.5rem; vertical-align: middle;"></i>Insulin</li>
+                <li class="list-group-item bg-transparent px-0 py-2 border-0"><i class="fa-solid fa-circle text-teal-primary me-2" style="font-size: 0.5rem; vertical-align: middle;"></i>BMI</li>
+                <li class="list-group-item bg-transparent px-0 py-2 border-0"><i class="fa-solid fa-circle text-teal-primary me-2" style="font-size: 0.5rem; vertical-align: middle;"></i>Diabetes Pedigree Function</li>
+                <li class="list-group-item bg-transparent px-0 py-2 border-0"><i class="fa-solid fa-circle text-teal-primary me-2" style="font-size: 0.5rem; vertical-align: middle;"></i>Age</li>
+            </ul>
+        </div>
+
+        <div class="card border-0 shadow-sm modern-card p-4 mb-4">
+            <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-microchip text-success me-2"></i>Technology</h5>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-light text-dark border">Python</span>
+                <span class="badge bg-light text-dark border">Django</span>
+                <span class="badge bg-light text-dark border">Pandas</span>
+                <span class="badge bg-light text-dark border">NumPy</span>
+                <span class="badge bg-light text-dark border">Scikit-learn</span>
+                <span class="badge bg-light text-dark border">SHAP</span>
+                <span class="badge bg-light text-dark border">Plotly</span>
+                <span class="badge bg-light text-dark border">SQLite</span>
+                <span class="badge bg-light text-dark border">Bootstrap</span>
+            </div>
+        </div>
+
+        <!-- Medical Disclaimer -->
+        <div class="card border-0 shadow-sm modern-card p-4 border-start border-4 border-warning">
+            <h5 class="fw-bold text-warning mb-2"><i class="fa-solid fa-triangle-exclamation me-2"></i>Medical Disclaimer</h5>
+            <p class="text-secondary small mb-0" style="line-height: 1.6;">
+                DiabPredict is an educational machine-learning application and is not a medical diagnostic tool. Its predictions should not replace professional medical evaluation or medical advice.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
